@@ -1,0 +1,15 @@
+
+
+services:
+  base_service:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: base_image
+    tty: true
+    volumes:
+      - ${DATAPATH:?err}:/work/data
+      - ${RESULTSPATH:?err}:/work/results
+      - ${CODEPATH:?err}:/work/code
+
+
