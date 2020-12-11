@@ -1,6 +1,63 @@
 # Read-Me
 
-This repo implements an encoder decoder meta search space for semantic segmentation. The applied search strategy is random sampling combined with early stopping.
+This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. 
+Single neural architectures can be specified analoguous to space spaces in .py configuration files.
+
+
+The key idea is to make any instantiated model agnostic of whether it is being sampled as part of a search process or as a stand-alone model.
+As such the sampling and the model-related logic is in in pure PyTorch and only relies on Python's standard library, whereas the applied search alogrithm may 
+be selected by the user. You can switch to the Ray branch of this repository to see an example of how EncDecMeta is being combined with the implementation of the ASHA search algorithm in Ray Tune.
+
+The search space consists of three abstractions:
+
+- `Downsampling Blocks` halving the resolution of incoming feature maps while doubling the number of channels. The first operation in such a block is always hard-coded to be a 3x3 convolution with stride 2. After this layer, an arbitrary number of layers can be specified within the block. See more on the candidate operations below. 
+
+- `Bottleneck Blocks` keeping both the number of feature maps and the spatial resolution constant. Within these blocks an arbitrary number of layers can be specified.
+
+- `Upsampling Blocks` always double the spatial resolution while halving the number of outgoing feature maps compared to the previous block. In these blocks the first two layers are hardcoded. Firstly, a 1x1 depthwise convolution fuses feature maps from the previous decoder block and the horizontally skip-connected encoder blocks of the same spatial resolution. Then a 3x3 transpose convolution with stride 2 guarantees the upsampling by a factor of two. Afterwards, an arbitrary number of layers can be horizontally stacked.
+
+
+These operations can be selected when specifiying a block:
+
+
+
+
+
+
+
+EncDecMeta fixes certain design choices, while keeping a high flexibility for other ones:
+
+
+
+
+
+containing a conv
+The idea is to abstract the instantiation of a model 
+
+
+neural architecture search algorithm and itsimplementation are abstracted away from the
+
+EncDecMeta has these primary use
+
+
+
+, see the Ray branch of this repository for an example of applying the bandt
+
+PyTorch-based,
+
+
+
+It consists of stackable downsampling, bottleneck, and upsampling blocks, which can contain
+
+
+
+
+
+
+
+
+
+The applied search strategy is random sampling combined with early stopping.
 Search spaces are defined as dictionaries in a .py configuration file. Fixed architectures can be defined analoguously, think of them as search spaces with exactly one choice to sample from.
 Under `/configurations`, a readme describes how to proceed and several example configuration files are provided.
 
