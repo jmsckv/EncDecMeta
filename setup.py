@@ -21,9 +21,8 @@ setup(
     author_email='p.jamscikov@gmail.com',
     package_dir={'':'src'},
     packages=find_namespace_packages('./src'),
-    install_requires=['prettytable==0.7.2'],
-    extras_require={'development': ['twine', 'pytest','setutools', 'wheel'],
-                    'extended': ['pandas','jupyterlab','widgetsnbextension'],
+    install_requires=['prettytable==0.7.2', 'Pillow==2.2.2'],
+    extras_require={'development': ['twine', 'pytest','setuptools', 'wheel' ,'pandas','jupyterlab','widgetsnbextension'],
                     'ray': ['ray[tune]', 'tensorboard', 'tensorboardX']}  
     #entry_points={'console_scripts': ['preprocess_cityscapes=package.preprocessing.preprocess_cityscapes.py:main']}
 )
