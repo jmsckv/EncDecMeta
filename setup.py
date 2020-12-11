@@ -6,6 +6,9 @@ from setuptools import setup, find_namespace_packages  #, find_packages > uncomm
 # https://godatadriven.com/blog/a-practical-guide-to-using-setup-py/
 # https://www.youtube.com/watch?v=GIF3LaRqgXo
 
+# https://setuptools.readthedocs.io/en/latest/userguide/keywords.html?highlight=setup()
+
+
 # TODO: what would do py_modules=['encdecmeta'] > does this refer to the name you would import?
 # TODO: unittest's discovery mode does not work in the current setup, maybe also bug related to VSCODE?
 
@@ -21,8 +24,8 @@ setup(
     author_email='p.jamscikov@gmail.com',
     package_dir={'':'src'},
     packages=find_namespace_packages('./src'),
-    install_requires=['prettytable==0.7.2', 'Pillow==2.2.2'],
-    extras_require={'development': ['twine', 'pytest','setuptools', 'wheel' ,'pandas','jupyterlab','widgetsnbextension'],
-                    'ray': ['ray[tune]', 'tensorboard', 'tensorboardX']}  
+    install_requires=['torch==1.7.0','torchvision==0.8.0', 'prettytable==0.7.2', 'Pillow>=2'],
+    tests_require = ['pytest','scikit-learn'],
+    extras_require={'dev': ['twine', 'setuptools', 'wheel' ,'pandas','jupyterlab','widgetsnbextension'],
+                    'ray': ['ray[tune]', 'tensorboard', 'tensorboardX']})
     #entry_points={'console_scripts': ['preprocess_cityscapes=package.preprocessing.preprocess_cityscapes.py:main']}
-)
