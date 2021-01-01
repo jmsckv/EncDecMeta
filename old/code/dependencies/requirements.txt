@@ -1,7 +1,0 @@
-ray[tune]
-tensorboard
-tensorboardX
-pandas
-jupyterlab
-widgetsnbextension
-prettytable
