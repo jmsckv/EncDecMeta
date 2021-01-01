@@ -33,7 +33,7 @@
 
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [8888,6006],
+	"forwardPorts": [8888,6006,8625],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "python -c 'print('running post create command')",
@@ -42,3 +42,4 @@
 	// Comment out to connect as non-root
 	// "remoteUser": "vscode"
 }
+

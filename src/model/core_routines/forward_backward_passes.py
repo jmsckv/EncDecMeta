@@ -35,7 +35,7 @@ def forward_pass_train(data_loader, optimizer, network, loss_function, metrics_a
     loss_multiplier = torch.cuda.DoubleTensor([1/len(data_loader)]) if torch.cuda.is_available() else torch.DoubleTensor([1/len(data_loader)])
     epoch_loss = torch.cuda.DoubleTensor([0]) if torch.cuda.is_available() else torch.DoubleTensor([0])
 
-    if config['sanity_checks']:
+    if config['debug']:
         if torch.cuda.is_available():
             assert loss_multiplier.is_cuda and epoch_loss.is_cuda
 
@@ -43,8 +43,8 @@ def forward_pass_train(data_loader, optimizer, network, loss_function, metrics_a
 
     for step, (data, labels) in enumerate(data_loader): # for each batch...
 
-        if config['verbose']:
-            print(f'Training loop, step {step}.')
+        if config.get('verbose', False):
+            print(f'\nTraining loop, batch {step}.')
 
         optimizer.zero_grad()  # reset gradients
         if torch.cuda.is_available():
@@ -57,7 +57,7 @@ def forward_pass_train(data_loader, optimizer, network, loss_function, metrics_a
         loss.backward()  # compute gradients
         optimizer.step()  # perform optimization step
 
-        if config['sanity_checks']:
+        if config['debug']:
             if step < 5 and torch.cuda.is_available():
                 assert loss_multiplier.is_cuda and epoch_loss.is_cuda and loss.is_cuda
 
@@ -74,7 +74,7 @@ def forward_pass_val(data_loader, network, loss_function, metrics_aggregator, co
     loss_multiplier = torch.cuda.DoubleTensor([1 / len(data_loader)]) if torch.cuda.is_available() else torch.DoubleTensor([1 / len(data_loader)])
     epoch_loss = torch.cuda.DoubleTensor([0]) if torch.cuda.is_available() else torch.DoubleTensor([0])
 
-    if config['sanity_checks']:
+    if config['debug']:
         if torch.cuda.is_available():
             assert epoch_loss.is_cuda and loss_multiplier.is_cuda
 
@@ -83,8 +83,8 @@ def forward_pass_val(data_loader, network, loss_function, metrics_aggregator, co
     with torch.no_grad():
         for step, (data, labels) in enumerate(data_loader):
 
-            if config['verbose']:
-                print(f'Validation loop, step {step}.')
+            if config.get('verbose', False):
+                print(f'\nValidation loop, batch {step}.')
 
             if torch.cuda.is_available():
                 data = data.cuda()
@@ -94,8 +94,8 @@ def forward_pass_val(data_loader, network, loss_function, metrics_aggregator, co
             epoch_loss += loss_multiplier * loss.detach().data
             metrics_aggregator.update_state(logits, labels)
 
-    if config['sanity_checks']:
-        if step < 5 and torch.cuda.is_available():
+    if config['debug']:
+        if torch.cuda.is_available():
             assert loss_multiplier.is_cuda and epoch_loss.is_cuda and loss.is_cuda
 
     return metrics_aggregator.get_metrics(add_metrics={'loss': epoch_loss})

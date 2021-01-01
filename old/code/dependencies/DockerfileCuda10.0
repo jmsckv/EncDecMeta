@@ -1,0 +1,41 @@
+FROM pytorch/pytorch:1.2-cuda10.0-cudnn7-runtime
+
+RUN apt-get update -qq && apt-get install -y -qq \
+    wget \
+    nano \
+    curl \
+    screen \
+    vim \
+    git \
+    tmux \
+    cmake \
+    tree\
+    rsync\
+    ssh
+
+
+RUN mkdir -p /tmp
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
+
+RUN jupyter nbextension enable --py widgetsnbextension
+#RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+#RUN apt-get install -y nodejs
+#RUN jupyter labextension install jupyterlab_bokeh
+# ValueError: The extension "jupyterlab_bokeh" does not yet support the current version of JupyterLab.
+
+# Set up our notebook config.
+COPY /jupyter_notebook_config.py /root/.jupyter/
+COPY /.bashrc /root/
+
+ENV DATAPATH=/data
+ENV RESULTSPATH=/results
+ENV PYTHONPATH=/code 
+
+ENV SHELL=/bin/bash 
+
+WORKDIR /code
+
+CMD ["/bin/bash"]
+
+

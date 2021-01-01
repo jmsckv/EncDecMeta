@@ -1,8 +1,48 @@
-from utils.sampling import sample_randomly, sample_block, sample_blocks, sample_arch, validate_and_sample_config
+from utils.sampling import sample_randomly, sample_block, sample_blocks, sample_arch, validate_config, sample_config
 from utils.test_generator import EncDecTestGenerator
 import unittest
+import random
 
-class SampleRandomly(unittest.TestCase):
+
+class TestValidatingConfig(unittest.TestCase):
+    """
+    Test validation of configuration file prior to sampling.
+    """
+    def setUp(self):
+        self.e = EncDecTestGenerator()
+
+    def test_tuple_validation(self):
+        self.assertTrue(validate_config(self.e.cfg_fixed)) # shows that EncDecTestGenerator starts wit a valid test case as cfg_fixed
+        for i in [(0,10.), (2.3,11)]:
+            self.e.cfg_fixed.update({'a':i})
+            self.assertTrue(validate_config(self.e.cfg_fixed))
+        for i in [(123),(1,),(1,'2')]:
+            with self.subTest('Testing Tuple Validation Functionality for:',i=i):
+                with self.assertRaises(AssertionError):
+                    self.e.cfg_fixed.update({'a':i})
+                    validate_config({'a':i}.update(self.e.cfg_fixed))
+
+    def test_block_validation(self):
+        for i in range(10):
+            b = [(random.choice('CHOV'),random.choice(range(1,20))) for i in range(random.choice(range(3,10)))]
+            with self.subTest('Validating block:', b=b):
+                for j in ['D_blocks','U_blocks','B_blocks']:
+                    self.e.cfg_fixed[j] = [b]
+                self.assertTrue(validate_config(self.e.cfg_fixed))
+                for j in ['D_blocks','U_blocks','B_blocks']:
+                    self.e.cfg_fixed[j] = b
+                with self.assertRaises(AssertionError):
+                    validate_config(self.e.cfg_fixed)
+            for b in [ [('H',3)*3],[('H',0)], [('V',3),('A',1)]]:
+                with self.subTest('Validating block:', b=b):
+                    for j in ['D_blocks','U_blocks','B_blocks']:
+                        self.e.cfg_fixed[j] = [b]
+                    with self.assertRaises(AssertionError):
+                        validate_config(self.e.cfg_fixed)
+
+
+    
+class TestSamplingNonArch(unittest.TestCase):
     """
     Test functionality of random sampling being applied to config file.
     """
@@ -24,15 +64,11 @@ class SampleRandomly(unittest.TestCase):
         self.assertEqual(sample_randomly((.5,.5)),.5)
         self.assertGreater(sample_randomly((.5,.51)),.5)
         self.assertAlmostEqual(sample_randomly((0.999999999999,1)),1)
-        with self.assertRaises(AssertionError):
-            sample_randomly((1,))
-            sample_randomly((1,2,3))
-            sample_randomly((1,'2'))
 
 
-class SampleArch(unittest.TestCase):
+class TestSamplingArch(unittest.TestCase):
     """
-    Validate and sample architecture blocks.
+    Test correct sampling of architecture blocks.
     """
 
     def test_sample_blocks(self):
@@ -58,18 +94,6 @@ class SampleArch(unittest.TestCase):
         self.assertLessEqual(sampled[2][1],10)
         self.assertIn(sampled[3][0],'OV')
         self.assertEqual(sampled[3][1],1)
-
-        # catching assertion errors
-        errors = []
-        errors += [[('A',3),('C',700)]] # unknown str
-        errors += [[(['A','H'],3),('C',700)]] # unknown str
-        errors += [[('C',7.)]] # float
-        errors += [[('H',3),('C',700),['O',1]]] # list instead of tuple
-        errors += [()]
-        for e in errors:
-            with self.subTest('Failing for:', e=e):
-                with self.assertRaises(AssertionError):
-                    sample_block(e)   
 
 
 
@@ -102,13 +126,6 @@ class SampleArch(unittest.TestCase):
         self.assertEqual(cfg['U_blocks'], [bl,[],bl]) 
         self.assertEqual(cfg['B_blocks'],[bl]) 
         self.assertEqual(cfg['D_blocks'],3*[bl]) 
-        with self.assertRaises(AssertionError):
-            cfg['B_blocks'] = []
-            cfg = sample_arch(cfg)
-        with self.assertRaises(AssertionError):
-            cfg['B_blocks'] = [bl_s]
-            cfg['D_blocks'] = [bl_s] * 2 
-            cfg = sample_arch(cfg)
 
 
 
@@ -132,14 +149,16 @@ class SampleArch(unittest.TestCase):
                             self.assertIn(l[1],[700,701])
 
 
-
-class SampleArchAndHps(unittest.TestCase):
+class SampleAndValidate(unittest.TestCase):
     """
     Validate and sample architecture blocks.
     """
 
-    def test_validate_and_sample_config_0(self):
-        tg = EncDecTestGenerator()
+    def setUp(self):
+        self.e = EncDecTestGenerator()
+
+    def test_validate_and_sample(self):
+        tg = self.e
         # generate valid test cases: multiples of 2
         tg.cfg_fixed['H'] = 4
         tg.cfg_fixed['W'] = 4
@@ -152,23 +171,8 @@ class SampleArchAndHps(unittest.TestCase):
             tg.cfg_fixed['W'] = int(2*2**i)
             for j in tg.generate_tests:
                 with self.subTest('Evaluating for:', j=j):
-                    cfg = validate_and_sample_config(j)
-                    self.assertTrue(cfg)
-
-
-    def test_validate_and_sample_config_1(self):
-        # should raise assertion error
-        with self.assertRaises(AssertionError): # change to ValueError > works
-            tg = EncDecTestGenerator()
-            c = [('C',2)] 
-            tg.cfg_fixed['D_blocks'] = [c]*2
-            tg.cfg_fixed['U_blocks'] = [[]]*2
-            tg.cfg_fixed['B_blocks'] = [c]
-            tg.cfg_fixed['H'] = 6
-            tg.cfg_fixed['W'] = 16
-            validate_and_sample_config(next(tg.generate_tests))
-
-
+                    cfg = validate_config(j)
+                    cfg = self.assertTrue(sample_config(cfg))
 
 
 if __name__ == '__main__':

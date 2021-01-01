@@ -2,12 +2,11 @@ from typing import Dict, List, Optional, Tuple
 import torch.nn as nn
 import random
 
-
 ############
 # CONV LAYER 
 ############
 
-def get_conv_layer(conv_type, conv_spec:dict, out_conv=False, **kwargs):
+def get_conv_layer(conv_type, conv_spec:dict, config:dict, out_conv=False):
     """
     Get a standard convolutional layer, where convolutions are followed by batch norm and activation layer.
     This function can also be applied to a transposed and one-by-one (depthwise) convolution.
@@ -19,9 +18,9 @@ def get_conv_layer(conv_type, conv_spec:dict, out_conv=False, **kwargs):
     else:
         return nn.Sequential(
             conv_type(**conv_spec),
-            nn.BatchNorm2d(num_features=conv_spec['out_channels'], momentum=kwargs['momentum_bn']),
-            kwargs['activation_function'],
-            nn.Dropout(kwargs['dropout_ratio']))
+            nn.BatchNorm2d(num_features=conv_spec['out_channels'], momentum=config['momentum_bn']),
+            config['activation_function'],
+            nn.Dropout(config['dropout_ratio']))
 
 
 ########
@@ -65,7 +64,7 @@ def get_layer(operation:str, in_channels:int, out_channels:int, config:dict, dil
         if operation == 'V': # V: 3*1, 'vertical' convolution
             conv_spec = {**conv_spec,**{'dilation': (dilation, 1), 'kernel_size': (3, 1), 'padding': (dilation, 0)}}
             
-    return get_conv_layer(operation_translated,conv_spec,**config)
+    return get_conv_layer(operation_translated,conv_spec,config)
 
 
 
@@ -167,4 +166,3 @@ for block_type in 'DU': # 'DU'
             block, arch = sample_block(block_type,block_number,sampled_layers,sampled_config)
             print(block,arch)
 """
-

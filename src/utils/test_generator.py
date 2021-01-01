@@ -101,9 +101,13 @@ class EncDecTestGenerator(TestGenerator):
                                 'batch_size': 10,
                                 'number_of_layers': 3,
                                 'dilation': 4,
-                                'learning_rate': 0.01,
-                                'momentum': 0.1,                                
-                                })
+                                'lr': 0.01,
+                                'momentum': 0.1,
+                                'num_samples':1,
+                                'D_blocks':[[],[]],
+                                'U_blocks':[[],[]],
+                                'B_blocks':[[('H',3)]],
+                                'experiment_name':'encdectg'})
                          #cfg_var={
                                 #'activation_function': [nn.ReLU(), nn.LeakyReLU(negative_slope=0.05)]
                                 #'padding_mode': ['replicate'],  

@@ -11,12 +11,10 @@ class MetricsAggregator:
     3. Number of samples evaluated so far.
     """
     def __init__(self, fold, config):
-        dataset = config['dataset']['selected']
-        n_cl = config['dataset'][dataset]['n_classes']
-        self.sanity_checks = config['sanity_checks']
+        n_cl = config['classes']
+        self.debug = config['debug']
         self.fold = fold
-        self.res = int(config['dataset'][dataset]['height'] * config['dataset'][dataset]['width'])
-
+        self.res = int(config['H'] * config['W'])
         self.tensors = dict()
 
         # confusion matrix and pixel count per class
@@ -25,14 +23,14 @@ class MetricsAggregator:
 
         # background classes can get 'M'asked
         self.tensors['M'] = torch.cuda.BoolTensor(n_cl * [True]) if torch.cuda.is_available() else torch.BoolTensor(n_cl * [True])
-        if config['dataset'][dataset]['bg_classes']:
-            for i in config['dataset'][dataset]['bg_classes']:
+        if config.get('bg_classes', False):
+            for i in config['bg_classes']:
                 self.tensors['M'][i] = False
 
         # this scalar gets continuously updated, treat it as a tensor
         self.tensors['samples_evaluated'] = torch.cuda.DoubleTensor([0]) if torch.cuda.is_available() else torch.DoubleTensor([0])
 
-        if self.sanity_checks:
+        if self.debug:
             assert fold in ['train', 'val', 'test']
             if torch.cuda.is_available():
                 for t in self.tensors: assert self.tensors[t].is_cuda
@@ -53,12 +51,15 @@ class MetricsAggregator:
         :param logits: nn outputs with shape N,C,H,W
         :param labels: gt labels with shape N,H,W; for every value v in this tensor must hold: 0<=v<C
         """
-        labels = labels.unsqueeze(dim=1).cuda()  # N,1,H,W
-        predictions = logits.max(axis=1)[1].unsqueeze(dim=1).cuda()  # N,1,H,W
-        preds_1hot = torch.zeros_like(logits, dtype=bool).scatter_(1, predictions, True).cuda()
-        labels_1hot = torch.zeros_like(logits, dtype=bool).scatter_(1, labels, True).cuda()
+        labels = labels.unsqueeze(dim=1) #.cuda()  # N,1,H,W
+        predictions = logits.max(axis=1)[1].unsqueeze(dim=1) #.cuda()  # N,1,H,W
+        preds_1hot = torch.zeros_like(logits, dtype=bool).scatter_(1, predictions, True)#.cuda()
+        labels_1hot = torch.zeros_like(logits, dtype=bool).scatter_(1, labels, True)#.cuda()
 
-        if self.sanity_checks:
+        if self.debug:
+            if torch.cuda.is_available():
+                for t in ['labels','preditions','preds_1hot','labels_1hot']:
+                    assert t.is_cuda
             assert logits.shape[0] ==  labels.shape[0]
             assert logits.shape == preds_1hot.shape
             assert logits.shape[1] >= labels.max()
@@ -74,7 +75,7 @@ class MetricsAggregator:
         self.tensors['PX_CNT'] += torch.sum(labels_1hot , dim=(0, 2, 3)).double()
         self.tensors['samples_evaluated'] += logits.shape[0]
         
-        if self.sanity_checks:
+        if self.debug:
             if torch.cuda.is_available():
                 for t in self.tensors: assert self.tensors[t].is_cuda
 
@@ -86,7 +87,7 @@ class MetricsAggregator:
         """
         tot_px_cnt = self.res * int(self.tensors['samples_evaluated'][0])
 
-        if self.sanity_checks:
+        if self.debug:
             sum_per_class = self.tensors['TP'] + self.tensors['TN'] + self.tensors['FP'] + self.tensors['FN']
             unique = sum_per_class.unique()
             assert len(unique) == 1, 'Expect to observe the exact same number for all classes.'
@@ -96,7 +97,7 @@ class MetricsAggregator:
         mask_bg = self.tensors['M']
         mask_combined = (self.tensors['M'] * mask_non_observed).bool() # in PyTorch 1.4 no logical AND
 
-        if self.sanity_checks:
+        if self.debug:
             assert mask_combined.sum() <= mask_bg.sum()
             assert mask_combined.sum() <= mask_non_observed.sum()
                                                             
@@ -108,7 +109,7 @@ class MetricsAggregator:
         mIoU = torch.mean(IoUs[mask_combined])
         mIoU_bg_included = torch.mean(IoUs[mask_non_observed])
 
-        if self.sanity_checks:
+        if self.debug:
             if torch.cuda.is_available():
                 for i in [accuracies, acc, acc_bg_included, IoUs, mIoU, mIoU_bg_included]:
                     assert i.is_cuda
@@ -123,7 +124,7 @@ class MetricsAggregator:
             results['IoU_class_' + str(i) + '_' + self.fold] = float(IoUs[i].cpu())
             results['acc_class_' + str(i) + '_' + self.fold] = float(accuracies[i].cpu())
 
-        if self.sanity_checks:
+        if self.debug:
             for k in results:
                 if isinstance(results[k], float) and not math.isnan(results[k]):
                     # don't apply check to nans and str; we don't use exactly 1 due to smaller rounding error
