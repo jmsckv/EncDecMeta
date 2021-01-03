@@ -1,54 +1,55 @@
-# 2 stage build
+# 4 Build stages would make sense
 # 1. Pytorch Base Image, Develop and Debug from within IDE / command line
-# 2. Additional Python Libraries to discuss results: Jupyterlab, Pandas
+# 2. Additional Python Libraries to discuss results: Jupyterlab, Maplotlib, ...
+# 3. Test Libraries
+# 4. Libraries to package and pulish to PyPi
 
-FROM pytorch/pytorch AS base_image
+FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-runtime AS base_image
+
+
+RUN apt-get update -qq && apt-get install -y -qq \
+    #wget \
+    nano \
+    curl \
+    #screen \
+    #vim \
+    git \
+    tmux \
+    #cmake \
+    tree\
+    rsync\
+    ssh
+
 
 SHELL ["/bin/bash", "-c"]
 
-WORKDIR /work
-ENV DATAPATH=/work/data
-ENV RESULTSPATH=/work/results
-ENV CODEPATH=/work/code
+ENV DATAPATH=/data
+ENV RAW_DATAPATH=/data/raw
+ENV PROC_DATAPATH=/data/proc
+ENV RESULTSPATH=/results
+ENV CODEPATH=/code
 RUN mkdir -p $CODEPATH
-RUN mkdir -p $DATAPATH
+RUN mkdir -p $PROC_DATAPATH
+RUN mkdir -p $RAW_DATAPATH
 RUN mkdir -p $RESULTSPATH
 
-COPY . $CODEPATH
-RUN cd $CODEPATH && pip install -e .
-
-
-##################################
-
-FROM base_image AS extended_image
-
-RUN cd ${CODEPATH} && pip install -e .[extended]
-RUN jupyter nbextension enable --py widgetsnbextension
-
-COPY jupyter_notebook_config.py /root/.jupyter/
-COPY .bashrc /root/
+WORKDIR $CODEPATH
 
 EXPOSE 8888
 EXPOSE 6006
+EXPOSE 8265
 
-#### TODO:image for testing
 
+# we use caching: add requirements > install requirements
 
-# [Optional] Allow the vscode user to pip install globally w/o sudo
-#ENV PIP_TARGET=/usr/local/pip-global
-#ENV PYTHONPATH=${PIP_TARGET}:${PYTHONPATH}
-#ENV PATH=${PIP_TARGET}/bin:${PATH}
-#RUN mkdir -p ${PIP_TARGET} \
-#    && chown vscode:root ${PIP_TARGET} \
-#    && echo "if [ \"\$(stat -c '%U' ${PIP_TARGET})\" != \"vscode\" ]; then chown -R vscode:root ${PIP_TARGET}; fi" \
-#        | tee -a /root/.bashrc /home/vscode/.bashrc /root/.zshrc >> /home/vscode/.zshrc 
+# Setting up JupyterLab
 
-# [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
-# COPY requirements.txt /tmp/pip-tmp/
-# RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
-#    && rm -rf /tmp/pip-tmp
+ADD jupyterlab_requirements.txt . 
+RUN pip install -r jupyterlab_requirements.txt
+COPY jupyter_notebook_config.py /root/.jupyter/
+COPY .bashrc /root/
 
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update \
-#     && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+# Install EncDecMeta in editable mode, takes longer
+COPY . .
+RUN pip install -e .
+

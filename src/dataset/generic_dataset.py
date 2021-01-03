@@ -16,8 +16,9 @@ class GenericDataset(torch.utils.data.Dataset):
         if config.get('overfit', False): # check metrics to converge when memorizing one sample 
             self.test_run = 1
             self.fold = 'train'
-        self.img_dir =  os.path.join(os.environ['DATAPATH'],'data', self.fold)
-        self.label_dir = os.path.join(os.environ['DATAPATH'],'labels', self.fold)
+        self.data_path = config.get('PROC_DATAPATH', os.environ['PROC_DATAPATH'])
+        self.img_dir =  os.path.join(self.data_path ,'data', self.fold)
+        self.label_dir = os.path.join(self.data_path ,'labels', self.fold)
         
         # TODO: probably dict comprehension + zip faster        
         self.examples = []

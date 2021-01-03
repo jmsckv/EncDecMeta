@@ -67,5 +67,3 @@ do
     echo "Set "$p" to "$s"."
 done
 }
-
-set_portster

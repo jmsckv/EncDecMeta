@@ -1,0 +1,7 @@
+results/
+data/
+old/
+build/
+dist/
+.pypirc
+.configured_env_vars_docker

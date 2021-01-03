@@ -1,6 +1,6 @@
 """
 A minimum viable config file to train a fixed architecture.
-We reduce training and test set to 6 samples each via <test_run:6>.
+We reduce training and test set to 4 samples each via <test_run:6>.
 
 What you may want to additionally try out:
 
@@ -35,7 +35,7 @@ config = {'experiment_name': 'min_viable_fixed_arch',
 'nesterov': True,
 'base_channels': 8,
 'batch_size' : 2,
-'test_run': 6,
+'test_run': 4,
 'cpus_per_trial': 1, 
 'max_epochs':20,
 'verbose':True}

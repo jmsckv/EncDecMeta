@@ -151,7 +151,7 @@ def run_tune(config, return_analysis=False):
     Trainable,
     verbose = config.get('verbosity_tune',2),
     name = config['experiment_name'],
-    local_dir = config.get('results_path',os.environ['RESULTSPATH']),
+    local_dir = config.get('RESULTSPATH',os.environ['RESULTSPATH']),
     resources_per_trial = {'cpu': config.get('cpus_per_trial', 1), 'gpu': config.get('gpus_per_trial', 1 if torch.cuda.is_available() else 0)},
     scheduler = scheduler,
     stop = {'training_iteration': config.get('max_epochs', 500)},
