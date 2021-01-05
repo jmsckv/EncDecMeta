@@ -22,8 +22,8 @@ config = {'experiment_name': 'min_search',
 'batch_size': 3,
 'test_run': 6,
 'cpus_per_trial': 1,
-'max_epochs': 10,
-'num_samples': 10,
-'checkpoint_freq':1} # remove or change to None to keep for each model only best weights
+'max_epochs': 20,
+'num_samples': 20,
+'checkpoint_freq':None} # remove or change to None to keep for each model only best weights
 
 

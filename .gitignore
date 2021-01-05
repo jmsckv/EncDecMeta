@@ -1,5 +1,7 @@
 ### 
-# added by me
+# project setup specific
+####
+
 results/
 data/
 old/
@@ -7,7 +9,7 @@ build/
 dist/
 .pypirc
 .configured_env_vars_docker
-
+venv*/
 
 ### macOS ###
 # General
@@ -293,4 +295,5 @@ fabric.properties
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
 

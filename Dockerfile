@@ -1,11 +1,6 @@
-# 4 Build stages would make sense
-# 1. Pytorch Base Image, Develop and Debug from within IDE / command line
-# 2. Additional Python Libraries to discuss results: Jupyterlab, Maplotlib, ...
-# 3. Test Libraries
-# 4. Libraries to package and pulish to PyPi
-
-FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-runtime AS base_image
-
+FROM pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
+# FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-runtime AS base_image
+# note: the torch image comes with conda pre-installed but we don't make any use of it
 
 RUN apt-get update -qq && apt-get install -y -qq \
     #wget \
@@ -17,9 +12,8 @@ RUN apt-get update -qq && apt-get install -y -qq \
     tmux \
     #cmake \
     tree\
-    rsync\
-    ssh
-
+    rsync
+    #ssh\
 
 SHELL ["/bin/bash", "-c"]
 
@@ -35,21 +29,13 @@ RUN mkdir -p $RESULTSPATH
 
 WORKDIR $CODEPATH
 
-EXPOSE 8888
-EXPOSE 6006
-EXPOSE 8265
-
-
-# we use caching: add requirements > install requirements
-
 # Setting up JupyterLab
-
+# we use caching: add requirements > install requirements
 ADD jupyterlab_requirements.txt . 
 RUN pip install -r jupyterlab_requirements.txt
 COPY jupyter_notebook_config.py /root/.jupyter/
 COPY .bashrc /root/
 
-# Install EncDecMeta in editable mode, takes longer
-COPY . .
-RUN pip install -e .
-
+# install package in editable mode
+#ADD . .
+#RUN pip install -e .
