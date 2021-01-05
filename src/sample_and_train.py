@@ -48,22 +48,24 @@ class Trainable(tune.Trainable):
         self.config = config
         self.config['keep_best_only'] = not bool(self.config.get('checkpoint_freq', 0))
 
+        self.network = EncDec(self.config)
+        
         self.train_dataset = GenericDataset('train', self.config)
         self.val_dataset =  GenericDataset('val', self.config) 
         
  
         self.train_loader = torch.utils.data.DataLoader(dataset=self.train_dataset,
-                                                        batch_size= int(self.config['batch_size']),
+                                                        batch_size= self.network.config['batch_size'],
                                                         shuffle=True, drop_last=False)
 
         self.val_loader = torch.utils.data.DataLoader(dataset=self.val_dataset,
-                                                      batch_size= int(self.config.get('batch_size_val', self.config['batch_size'])),
+                                                      batch_size= self.network.config.get('batch_size_val', self.network.config['batch_size']),
                                                       shuffle=False, drop_last=False)
-
-        self.network = EncDec(self.config)
         
         self.network.serialize_config(self.logdir)
         count_parameters(self.network)
+        
+        
 
         self.optimizer = SGD(self.network.parameters(),lr = self.network.config['lr'], momentum=self.network.config['momentum'], weight_decay=self.network.config['weight_decay'], nesterov=self.network.config['nesterov'])
         self.loss_fn =  CrossEntropyLoss(weight=None)
