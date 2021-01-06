@@ -21,10 +21,11 @@ config = {'experiment_name': 'chargrid_searched',
 'lr': [i*j for i in [1,3,5,7] for j in [0.1, 0.01, 0.001]],
 'weight_decay': [i*j for i in [1,3,5,7] for j in [0.01, 0.001, 0.0001]],
 'nesterov': [True,False],
-'base_channels': [46,64,80], 
-'batch_size': range(3,20),
-'max_epochs': 300,
-'num_samples': 1000} 
+'base_channels': [32,46,64], 
+'batch_size': range(3,7) ,
+'max_epochs': 50,
+'num_samples': 50,
+'test_run': 50} 
 
 
 
