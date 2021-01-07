@@ -2,9 +2,14 @@
 
 This repo allows to easily specify and search encoder-decoder architectures and associated hyperparameters. It is based on PyTorch and Ray Tune, an the asysnchronous successive halving algorithm (ASHA) as a search strategy.
 
+The idea is to stack blocks: downsampling, bottleneck, and upsampling blocks.
+Each block consists of several convolutional layers. The framework allows to stack an arbitrary amount of blocks, and an arbitrary number of convolutional layers within a block. The only requirement is to have an equal number uf downsampling and upsampling blocks, at least one bottleneck block, and at least one layer within bottleneck blocks. Please also see the below section "Building Blocks". 
+
 
 **The current key use case is automating building robust, searched baselines for semantic segmentation tasks.**
-Current key restrictions are no data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
+Current restrictions are no data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
+
+
 
 
 ## Quickstart
@@ -29,11 +34,7 @@ pip install encdecmeta
 
 6. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` <YOUR_CONFIG.py> must be a .py file containing a dictionary named config. You can look at the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary.
 
-7. During training you can monitor the progress with:
-```
-pip install tensorboard
-tensorboard --logdir $RESULTSPATH --bind_all
-```
+7. During training you can monitor the progress with `pip install tensorboard && tensorboard --logdir $RESULTSPATH --bind_all`.
 
 
 ## Example: Unet
@@ -59,8 +60,10 @@ config = {'experiment_name': 'unet_fixed',
 'max_t': 500} #  max epochs (in ASHA's terms 'budget') any model may train; if searching, ASHA's early stopping points are derived from this quantity
 ```
 
-Train this model with: `$CODEPATH/src/sample_and_train.py $CODEPATH/src/configurations/unet.py`
+Train this model with `$CODEPATH/src/sample_and_train.py $CODEPATH/src/configurations/unet.py`
 See the .py file for a more detailed discussion on differences to the original Unet.
+
+Overall there are 5 downsampling blocks ('D_blocks') which always 
 
 
 ## Example: Search Unets
