@@ -56,21 +56,24 @@ Train this model with: `$CODEPATH/src/sample_and_train.py $CODEPATH/src/configur
 See the .py file for a more detailed discussion on differences to the original Unet.
 
 
-Instead of deciding for this fixed architecture, we can embed the above model in a search space (cf. `src/configurations/unet.py`) by altering the following the above dictionary as follows:
+## Example: Search Unets
+
+Instead of deciding for this fixed architecture, we can embed the above model in a search space (cf. `src/configurations/unet.py`) by altering the above dictionary as follows:
 
 ```
-c = (['H','V','C','O'], range(1,8)) # sampled layer: sample operation and dilation rate > more below
+c = (['H','V','C','O'], range(1,8)) # sampled layer, discussed below
 config['experiment_name'] = 'unet_searched'
 config['num_samples'] = 500 # evaluating 500 samples from this search space
-config['dropout_ratio']: (0,0.5), # sample from interval > continuous hyperparameter
-config['momentum']: (0.5,1), # 
-config['momentum_bn']: (0,1), 
-config['lr']: [i*j for i in [1,3,5,7] for j in [0.1, 0.01, 0.001]], # sample from list > discrete hyperparameter
-config['weight_decay']: [i*j for i in [1,3,5,7] for j in [0.01, 0.001, 0.0001]],
-config['nesterov']: [True,False],
-config['base_channels']: range(32,65),  # sample from range > discrete hyperparameter
-config['batch_size']: range(1,11),
+config['dropout_ratio']: (0,0.5) # continuous hyperparameter
+config['momentum']: (0.5,1) 
+config['momentum_bn']: (0,1)
+config['lr']: [i*j for i in [1,3,5,7] for j in [0.1, 0.01, 0.001]], # discrete hyperparameter
+config['weight_decay']: [i*j for i in [1,3,5,7] for j in [0.01, 0.001, 0.0001]]
+config['nesterov']: [True,False]
+config['base_channels']: range(32,65)  # sample from range > discrete hyperparameter
+config['batch_size']: range(1,11)
 ```
+
 We search jointly for a good configuration of the SGD optimizer, regularization, and architecture. Batch size and number of base channels can generally result in OOMs. In this case, simply another candidate will get sampled, no manual intervention is required.
 
 In general, we sample uniformly at random and from either lists, range objects or tuples. (Note: naively, you could model other distributions through repeating elements in a list).
