@@ -80,15 +80,14 @@ In general, we sample uniformly at random and from either lists, range objects o
 
 If a tuple contains first a list and then a list or range object it describes a convolutional layer.
 In this case, we sample from both tuple entries independently: first a layer operation, second the dilation rate.
+
 Currently, there are 4 operations supported: 
-- 'H' (horizontal) maps to a 1x3 convolution
-- 'V' (horizontal) maps to a 3x1 convolution
-- 'C' (horizontal) to a 3x1 convolution
+- `'H'` (horizontal) maps to a `1x3 convolution`
+- `'V'` (vertical) maps to a `3x1 convolution`
+- `'C'` to a `3x3 convolution`
+- `'O'`(one-by-one) to a `1x1 convolution`
 
-- 'O'
-
-
-Let's explain the above specifivation of the searched convolutional layer in more detail: `c = (['H','V','C','O'], range(1,8))`.
+So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now sample fro, 5*
 
 This framework propose 
 
