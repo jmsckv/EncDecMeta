@@ -5,11 +5,8 @@ This repo allows to easily specify and search encoder-decoder architectures and 
 The idea is to stack blocks: downsampling, bottleneck, and upsampling blocks.
 Each block consists of several convolutional layers. The framework allows to stack an arbitrary amount of blocks, and an arbitrary number of convolutional layers within a block. The only requirement is to have an equal number uf downsampling and upsampling blocks, at least one bottleneck block, and at least one layer within bottleneck blocks. Please also see the below section "Building Blocks". 
 
-
 **The current key use case is automating building robust, searched baselines for semantic segmentation tasks.**
 Current restrictions are no data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
-
-
 
 
 ## Quickstart
@@ -20,6 +17,7 @@ This code is tested with CUDA 10.2, Python 3.7.7 and setuptools 20.3.3 on Ubuntu
 2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab in your browser, the default password, which you can change in `jupyter_notebook_config.py` before launching the container, is ASHA2020.
 
 3. Create a Python virtutal env to install the project libraries. Do so from $CODEPATH in the Docker container, which maps to the root of this repo.
+
 ```
 python -m venv venv
 . venv/bin/activate
@@ -40,7 +38,6 @@ pip install encdecmeta
 ## Example: Unet
 
 We can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows:
-
 
 ```
 c = ('C',3)
@@ -99,55 +96,48 @@ Currently, there are 4 operations supported:
 - `'C'` to a `3x3 convolution`
 - `'O'`(one-by-one) to a `1x1 convolution`
 
-So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now describe a layer with 3 * 7 + 1 = 22 architectural decisions (for 'O' we ignore the sampled operation).
-W.r.t to the above U-Net, we hence now describe a search space of 22**11 = 5.843183e+14 discrete architectures, the other sampled hyperparameters not counted.
+So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now describe a layer with 3 * 7 + 1 = 22 architectural decisions (for 'O' we ignore the sampled dilation rate).
+W.r.t to the above Unet, we hence now describe a search space of 22**11 = 5.843183e+14 discrete architectures, the other sampled hyperparameters not counted.
 
 
 ## Building Blocks
 
 The search space consists of three abstractions:
 
-- `Downsampling Blocks` halving the resolution of incoming feature maps while doubling the number of channels. The first operation in such a block is always hard-coded to be a 3x3 convolution with stride 2. After this layer, an arbitrary number of layers can be specified within the block. See more on the candidate operations below. 
+- `Downsampling Blocks` halving the resolution of incoming feature maps while doubling the number of channels. The first operation in such a block is always hard-coded to be a 3x3 convolution with stride 2. After this layer, an arbitrary number of layers can be specified within the block.
 
-- `Bottleneck Blocks` keeping both the number of feature maps and the spatial resolution constant. Within these blocks an arbitrary number of layers can be specified.
+- `Bottleneck Blocks` keeping both the number of feature maps and the spatial resolution constant. Within each of these blocks at least on layer must be specified.
 
 - `Upsampling Blocks` always double the spatial resolution while halving the number of outgoing feature maps compared to the previous block. In these blocks the first two layers are hardcoded. Firstly, a 1x1 depthwise convolution fuses feature maps from the previous decoder block and the horizontally skip-connected encoder blocks of the same spatial resolution. Then a 3x3 transpose convolution with stride 2 guarantees the upsampling by a factor of two. Afterwards, an arbitrary number of layers can be horizontally stacked.
 
 
-
 ## Data - How to format your datasets.
 
-The current pipeline only supports two data sets (Chargrid and Cityscapes), being preprocessed as described in `code/preprocessing/preprocessing_{Cityscapes,Chargrid}.ipynb`. In general, also other datasets may easily be supported, which would however require certain abstractions in the code base.
-In general, RGB images are supported  as `.png` files. Images with more than 3 channels such as Chargrid are supported as `.npz` files. Semantic pixel-wise labels should always be provided in the same format as the data itself.
+The framework expects RGB images are supported  as .png files. Also the labels must be be formatted as such, but with only one channel.
+Note that we expect to have data and labels the same file name. It's the parent directories data/ and labels/ which allow to differentiate between them.
 
-The directory structure in `$DATAPATH` is already standardized for both datasets (hence no rework is required for any new datasets, though of course it is quite likely that the dataset would have to be formatted accordingly.)
-
-In general we expect `$DATAPATH` to be populated as follows:
+In general we suggest $DATAPATH to be populated as follows and require $PROC_DATAPATH to map to /proc:
 
 ```
-<DATASET1>/
-           raw/
-               specific_original_data_format_1/...
-            proc/
-                 data/
-                      train/
-                            -  file_name_1.png
-                            -  file_name_2.png
-                      val/
-                          - ...
-                      test/
-                          - ...
-                 labels/
-                      train/
-                            -  file_name_1.png
-                            -  file_name_2.png
-                      val/
-                          -...
-                      test/
-<DATASET2>/
-           raw/
-               specific_original_data_format_2/...
+raw/
+    specific_original_data_format_1/...
+ proc/
+      data/
+           train/
+                 -  file_name_1.png
+                 -  file_name_2.png
+           val/
+               - ...
+           test/
+               - ...
+      labels/
+           train/
+                 -  file_name_1.png
+                 -  file_name_2.png
+           val/
+               -...
+           test/
+
                   
 ```
-Note that we expect to have data and labels the same file name. It's the parent directories `data/` and `labels/` which allow to differentiate between them.
 
