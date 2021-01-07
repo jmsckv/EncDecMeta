@@ -73,6 +73,7 @@ Instead of deciding for this fixed architecture, we can embed the above model in
 
 ```
 c = (['H','V','C','O'], range(1,8)) # sampled layer, discussed below
+
 config['experiment_name'] = 'unet_searched'
 config['num_samples'] = 500 # evaluating 500 samples from this search space
 config['dropout_ratio']: (0,0.5) # continuous hyperparameter
@@ -89,7 +90,7 @@ We search jointly for a good configuration of the SGD optimizer, regularization,
 
 In general, we sample uniformly at random and from either lists, range objects or tuples. (Note: naively, you could model other distributions through repeating elements in a list).
 
-If a tuple contains first a list and then a list or range object it describes a convolutional layer.
+A tuple describes a convolutional layer if its first entry is a list containing a combination of {'H', 'V','C','O'}, the second one a list of integers or a range object.
 In this case, we sample from both tuple entries independently: first a layer operation, second the dilation rate.
 
 Currently, there are 4 operations supported: 
@@ -98,9 +99,9 @@ Currently, there are 4 operations supported:
 - `'C'` to a `3x3 convolution`
 - `'O'`(one-by-one) to a `1x1 convolution`
 
-So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now sample fro, 5*
+So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now describe a layer with 3*7 + 1 = 22 architectural decisions (for 'O' we ignore the sampled operation).
+W.r.t to the above U-Net, we now describe a search space of 22**11 = 5.843183e+14 discrete architectures, the other hyperparameters not included.
 
-This framework propose 
 
 
 
