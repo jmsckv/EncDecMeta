@@ -29,9 +29,9 @@ pip install encdecmeta
 
 5. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` <YOUR_CONFIG.py> must be a .py file containing a dictionary named config. You can look at the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary.
 
-## Example: U-Net
+## Example: Unet
 
-We can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows (see `src/configurations/unet.py`for more details).
+We can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows:
 
 
 ```
@@ -53,6 +53,7 @@ config = {'experiment_name': 'unet_fixed',
 ```
 
 Train this model with: `$CODEPATH/src/sample_and_train.py $CODEPATH/src/configurations/unet.py`
+See the .py file for a more detailed discussion on differences to the original Unet.
 
 
 Instead of deciding for this fixed architecture, we can embed the above model in a search space (cf. `src/configurations/unet.py`) by altering the following the above dictionary as follows:
