@@ -2,8 +2,9 @@
 
 This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. It is based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
 
-**The key use case is automating building a robusted (and searched!) baseline for semantic segmentation tasks.**
+**The current key use case is automating building robus (and searched!) baseline for semantic segmentation tasks.**
 Current key restrictions are not data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
+Please see below in the future extensions sections
 
 Fixed architectures can be specified analoguous to search space spaces in .py configuration files. 
 For example, we can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows (see `src/configurations/unet.py`for more details).
@@ -44,9 +45,17 @@ config['batch_size']: range(1,11),
 ```
 We search jointly for a good configuration of the SGD optimizer, regularization, and architecture. Batch size and number of base channels can generally result in OOMs. In this case, simply another candidate will get sampled, no manual intervention is required.
 
+In general, we sample uniformly at random and from either lists, range objects or tuples. (Note: naively, you could model other distributions through repeating elements in a list).
+
+If a tuple contains first a list and then a list or range object it describes a convolutional layer.
+In this case, we sample from both tuple entries independently: first a layer operation, second the dilation rate.
+Currently, there are 4 operations supported: 
+- 'H'
+
+
 Let's explain the above specifivation of the searched convolutional layer in more detail: `c = (['H','V','C','O'], range(1,8))`.
 
-This framework propose posibilities 
+This framework propose 
 
 
 
