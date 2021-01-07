@@ -20,7 +20,7 @@ python -m venv venv
 . venv/bin/activate
 pip install --upgrade pip
 pip install encdecmeta
-# pip install -e . # uncomment to install in editable mode
+# pip install -e . # run this instead the previous command to install in editable mode
 ```
 
 4. Specify $PROC_DATAPATH which should map to the preprocessed data. Below, in the section Data Layout, we describe in depth the naming conventions we expect. In the Docker container this env variable is automatatically set. It maps $CODEPATH/data/proc within the container to EncDecMeta/data/proc on your local disk.
