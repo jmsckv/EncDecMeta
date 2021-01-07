@@ -2,6 +2,20 @@
 
 ## Quickstart
 
+```
+
+```
+
+
+
+We propose to lau, we described how to launch in this repo in a Docker Container
+
+
+
+In general, we expect CUDA >=10.2, Python >= 
+
+Run 
+
 
 ```
 
