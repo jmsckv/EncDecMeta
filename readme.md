@@ -5,7 +5,9 @@ This repo allows to easily specify and search encoder-decoder architectures and 
 The idea is to stack blocks: downsampling, bottleneck, and upsampling blocks.
 Each block consists of several convolutional layers. The framework allows to stack an arbitrary amount of blocks, and an arbitrary number of convolutional layers within a block. The only requirement is to have an equal number uf downsampling and upsampling blocks, at least one bottleneck block, and at least one layer within bottleneck blocks. Please also see the below section "Building Blocks". 
 
-**The current key use case is automating building robust, searched baselines for semantic segmentation tasks.**
+**The current key use case is 
+
+ating building robust, searched baselines for semantic segmentation tasks.**
 Current restrictions are no data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
 
 
@@ -26,9 +28,9 @@ pip install encdecmeta
 # pip install -e . # run this instead the previous command to install in editable mode
 ```
 
-4. Specify $PROC_DATAPATH which should map to the preprocessed data. Below, in the section Data Layout, we describe in depth the naming conventions we expect. In the Docker container this env variable is automatatically set. It maps $CODEPATH/data/proc within the container to EncDecMeta/data/proc on your local disk.
+4. Specify $PROC_DATAPATH which should map to the preprocessed data. Below, in the section Data Layout, we describe in depth the naming conventions we expect. In the Docker container this env variable is automatically set. It maps $CODEPATH/data/proc within the container to EncDecMeta/data/proc on your local disk.
 
-5. Specify $RESULTSPATH where any experimental results are being stored. In the Docker container this env variable is automatatically set. It maps $CODEPATH/results within the container to EncDecMeta/results on your local disk.
+5. Specify $RESULTSPATH where any experimental results are being stored. In the Docker container this env variable is automatically set. It maps $CODEPATH/results within the container to EncDecMeta/results on your local disk.
 
 6. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` <YOUR_CONFIG.py> must be a .py file containing a dictionary named config. You can look at the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary.
 
@@ -75,9 +77,19 @@ Overall there are 5 downsampling and upsampling blocks as well as one bottleneck
 
 ## Example: Tweaking UNet
 
-asd
+We can easily manually tweak an existing architecture. For example, we may alter the following model by including three more layer types
+- `c2 = ('C', 2)` #  a convolution with dilation rate 2, which we use in the lower blocks of the network
+- `h3 = ('H', 3)` #  a 1x3 convolution with dilation rate 3, which we use in the lower blocks of the network to capture long-range dependencies
+- `h3 = ('V', 3)` #  a 3x1 convolution with dilation rate 3, which we use in the lower blocks of the network
 
+Also we may want to add more convolutional filters in the first blocks.
+We could then reformulate the net for example as:
 
+```
+'D_blocks': [[c,c,c],[c,c,c],[c2,c2],[c,c2],[c2,c2]]
+'B_blocks': [[h3,v3,h3,v3,h3,v3]]
+'U_blocks': [[c,c2],[c2,c2],[c2,c,2],[c,c,c],[c,c,c]]
+```
 
 
 ## Example: Search Unets
@@ -114,6 +126,8 @@ Currently, there are 4 operations supported:
 
 So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now describe a layer with 3 * 7 + 1 = 22 architectural decisions (for 'O' we ignore the sampled dilation rate).
 W.r.t to the above Unet, we hence now describe a search space of 22**11 = 5.843183e+14 discrete architectures, the other sampled hyperparameters not counted.
+
+Note that we could easily fix parts of an encoder-decoder network while searching others, e.g. only search the last upsampling block.
 
 
 ## Building Blocks
