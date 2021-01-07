@@ -1,5 +1,15 @@
 # A User-Friendly Encoder-Decoder Meta-Search-Space For Semantic Segmentation
 
+## Quickstart
+
+
+```
+## Quickstart
+```
+
+
+
+
 This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. It is based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
 
 **The current key use case is automating building robus (and searched!) baseline for semantic segmentation tasks.**
@@ -50,7 +60,11 @@ In general, we sample uniformly at random and from either lists, range objects o
 If a tuple contains first a list and then a list or range object it describes a convolutional layer.
 In this case, we sample from both tuple entries independently: first a layer operation, second the dilation rate.
 Currently, there are 4 operations supported: 
-- 'H'
+- 'H' (horizontal) maps to a 1x3 convolution
+- 'V' (horizontal) maps to a 3x1 convolution
+- 'C' (horizontal) to a 3x1 convolution
+
+- 'O'
 
 
 Let's explain the above specifivation of the searched convolutional layer in more detail: `c = (['H','V','C','O'], range(1,8))`.
