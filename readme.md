@@ -1,48 +1,51 @@
 # A User-Friendly Encoder-Decoder Meta-Search-Space For Semantic Segmentation
 
 This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. It is based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
+
+The key use case is automating building a robusted (and searched!) baseline for semantic segmentation tasks.
+
 Fixed architectures can be specified analoguous to search space spaces in .py configuration files. 
 For example, we can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows (see `src/configurations/unet.py`for more details).
 
 
-
 ```
-c = ('C', 3)
 config = {'experiment_name': 'unet_fixed',
 'D_blocks': [[c],[c],[c],[c],[]],
 'B_blocks': [[c]], 
 'U_blocks': [[c],[c],[c],[c], [c,c]],
 'H': 256, 
 'W': 512,  
-'dropout_ratio': 0,
+'dropout_ratio': 0.1,
 'momentum': 0.99,
 'momentum_bn': 0.1,
 'lr': 0.01,
 'weight_decay': 0.001,
 'nesterov': False,
 'base_channels': 64, 
-'batch_size': 1}
+'batch_size': 1,
+'max_t': 500} #  max epochs (in ASHA's terms 'budget') any model may train; if searching, ASHA's early stopping points are derived from this quantity
 ```
 
-Instead of deciding for this fixed architecture and we can now embed the above model in a search space as follows (cf. `src/configurations/unet.py`) :
+Instead of deciding for this fixed architecture and we can now embed the above model in a search space  as follows (cf. `src/configurations/unet.py`) by altering the following entries in the above dictionary as follows:
 
 ```
-c = (['H','V','C','O'], range(1,8))
-config = {'experiment_name': 'unet_fixed',
-'D_blocks': [[c],[c],[c],[c],[]],
-'B_blocks': [[c]], 
-'U_blocks': [[c],[c],[c],[c], [c,c]],
-'H': [256,512], 
-'W': [512,512],  
-'dropout_ratio': (,
-'momentum': 0.99,
-'momentum_bn': 0.1,
-'lr': 0.01,
-'weight_decay': 0.001,
-'nesterov': False,
-'base_channels': 64, 
-'batch_size': 1}
+c = (['H','V','C','O'], range(1,8)) # sampled layer: sample operation and dilation rate
+config['experiment_name'] = 'unet_searched'
+config['num_sammples'] = 500 # evaluating 500 samples from this search space
+config['dropout_ratio']: (0,0.5), # sample from interval > continuous hyperparameter
+config['momentum']: (0.5,1), # 
+config['momentum_bn']: (0,1), 
+config['lr']: [i*j for i in [1,3,5,7] for j in [0.1, 0.01, 0.001]], # sample from list > discrete hyperparameter
+config['weight_decay']: [i*j for i in [1,3,5,7] for j in [0.01, 0.001, 0.0001]],
+config['nesterov']: [True,False],
+config['base_channels']: range(32,65),  # sample from range > discrete hyperparameter
+config['batch_size']: range(1,11),
 ```
+
+
+
+
+Now, 
 
 
 
