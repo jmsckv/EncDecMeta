@@ -2,7 +2,8 @@
 
 This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. It is based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
 
-The key use case is automating building a robusted (and searched!) baseline for semantic segmentation tasks.
+The key use case is automating building a robusted (and searched!) baseline for semantic segmentation tasks. 
+Current key restrictions are not data augmentation mechanisms and no ResNet-like or DenseNet-like connections.
 
 Fixed architectures can be specified analoguous to search space spaces in .py configuration files. 
 For example, we can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows (see `src/configurations/unet.py`for more details).
@@ -26,12 +27,12 @@ config = {'experiment_name': 'unet_fixed',
 'max_t': 500} #  max epochs (in ASHA's terms 'budget') any model may train; if searching, ASHA's early stopping points are derived from this quantity
 ```
 
-Instead of deciding for this fixed architecture and we can now embed the above model in a search space  as follows (cf. `src/configurations/unet.py`) by altering the following entries in the above dictionary as follows:
+Instead of deciding for this fixed architecture, we can embed the above model in a search space (cf. `src/configurations/unet.py`) by altering the following the above dictionary as follows:
 
 ```
-c = (['H','V','C','O'], range(1,8)) # sampled layer: sample operation and dilation rate
+c = (['H','V','C','O'], range(1,8)) # sampled layer: sample operation and dilation rate > more below
 config['experiment_name'] = 'unet_searched'
-config['num_sammples'] = 500 # evaluating 500 samples from this search space
+config['num_samples'] = 500 # evaluating 500 samples from this search space
 config['dropout_ratio']: (0,0.5), # sample from interval > continuous hyperparameter
 config['momentum']: (0.5,1), # 
 config['momentum_bn']: (0,1), 
@@ -41,11 +42,15 @@ config['nesterov']: [True,False],
 config['base_channels']: range(32,65),  # sample from range > discrete hyperparameter
 config['batch_size']: range(1,11),
 ```
+We search jointly for a good configuration of the SGD optimizer, regularization, and architecture. Batch size and number of base channels can generally result in OOMs. In this case, simply another candidate will get sampled, no manual intervention is required.
+
+Let's explain the above specifivation of the searched convolutional layer in more detail: `c = (['H','V','C','O'], range(1,8))`.
+
+This framework propose posibilities 
 
 
 
 
-Now, 
 
 
 
