@@ -1,8 +1,17 @@
 # A User-Friendly Encoder-Decoder Meta-Search-Space For Semantic Segmentation
 
+This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. It is based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
+Fixed architectures can be specified analoguous to search space spaces in .py configuration files. 
+
+**The current key use case is automating building robus (and searched!) baseline for semantic segmentation tasks.**
+Current key restrictions are not data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
+
+
 ## Quickstart
 
 ```
+
+
 
 ```
 
@@ -26,13 +35,10 @@ Run
 
 
 
-This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. It is based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
 
-**The current key use case is automating building robus (and searched!) baseline for semantic segmentation tasks.**
-Current key restrictions are not data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
-Please see below in the future extensions sections
 
-Fixed architectures can be specified analoguous to search space spaces in .py configuration files. 
+
+
 For example, we can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows (see `src/configurations/unet.py`for more details).
 
 
