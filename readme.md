@@ -1,7 +1,7 @@
 # A User-Friendly Encoder-Decoder Meta-Search-Space For Semantic Segmentation
 
-This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. It is based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
-Fixed architectures can be specified analoguous to search space spaces in .py configuration files. 
+This repo allows to specify fixed encoder-decoder architectures analoguous to neural architecture search space spaces with a focus on ease-of use. The meta searchis based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
+
 
 **The current key use case is automating building robus (and searched!) baseline for semantic segmentation tasks.**
 Current key restrictions are not data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
@@ -14,7 +14,7 @@ This code is tested with CUDA 10.2, Python==3.7, and setuptools==20.3.3 on Ubunt
 
 2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use the `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab in your browser, the default password, which you can change in `jupyter_notebook_config.py` before launching the container, is ASHA2020.
 
-3. Create a Python virtutal env to install the projec libraries. Do so from $CODEPATH in the Docker container, which maps to the root of this repo.
+3. Create a Python virtutal env to install the project libraries. Do so from $CODEPATH in the Docker container, which maps to the root of this repo.
 ```
 python -m venv venv
 . venv/bin/activate
@@ -22,7 +22,7 @@ pip install --upgrade pip
 pip install encdecmeta
 ```
 
-4. Specify $PROC_DATAPATH which should map to the preprocessed data that is structured as described below in the section Data Layout. In the Docker container this env variable is automatatically set. It maps $CODEPATH/data/proc within the container to EncDecMeta/data/proc on your local disk.
+4. Specify $PROC_DATAPATH which should map to the preprocessed data. Below, in the section Data Layout, we describe in depth the naming conventions we expect. In the Docker container this env variable is automatatically set. It maps $CODEPATH/data/proc within the container to EncDecMeta/data/proc on your local disk.
 
 5. Specify $RESULTSPATH where any experimental results are being stored. In the Docker container this env variable is automatatically set. It maps $CODEPATH/results/ within the container to EncDecMeta/results on your local disk.
 
