@@ -34,6 +34,15 @@ pip install encdecmeta
 
 7. During training you can monitor the progress with `pip install tensorboard && tensorboard --logdir $RESULTSPATH --bind_all`.
 
+### Tips $ Tricks
+
+Especially to familiarize yourself with the framework, you may want to modify the config file by adding or combining the following options:
+- `config['verbose']=True` to gain more insight on what is going in the background, e.g. metrics are being calculated
+- `'overfit['overfit']=True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly
+- `'overfit['num_samples']=X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
+
+Further you can find out about configurable hyperparameters for which a default value is set by `cd $CODEPATH && grep -r config.get`.
+
 
 ## Example: Unet
 
@@ -63,6 +72,13 @@ Train this model with `$CODEPATH/src/sample_and_train.py $CODEPATH/src/configura
 See the .py file for a more detailed discussion on differences to the original Unet.
 
 Overall there are 5 downsampling and upsampling blocks as well as one bottleneck block.
+
+## Example: Tweaking UNet
+
+asd
+
+
+
 
 ## Example: Search Unets
 
