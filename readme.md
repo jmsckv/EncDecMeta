@@ -1,18 +1,18 @@
 # A User-Friendly Encoder-Decoder Meta-Search-Space For Semantic Segmentation
 
-This repo allows to specify fixed encoder-decoder architectures analoguous to neural architecture search space spaces with a focus on ease-of use. The meta searchis based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
+This repo allows to easily specify and search encoder-decoder architectures and associated hyperparameters. It is based on PyTorch and Ray Tune, an the asysnchronous successive halving algorithm (ASHA) as a search strategy.
 
 
-**The current key use case is automating building robus (and searched!) baseline for semantic segmentation tasks.**
-Current key restrictions are not data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
+**The current key use case is automating building robust, searched baselines for semantic segmentation tasks.**
+Current key restrictions are no data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
 
 
 ## Quickstart
 
 1. Clone this repository: ```https://github.com/jmsckv/EncDecMeta.git && cd EncDecMeta ```
-This code is tested with CUDA 10.2, Python==3.7, and setuptools==20.3.3 on Ubuntu 18.04. Higher versions should generally be supported.
+This code is tested with CUDA 10.2, Python 3.7.7, and setuptools 20.3.3 on Ubuntu 18.04. Higher versions should generally be supported.
 
-2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use the `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab in your browser, the default password, which you can change in `jupyter_notebook_config.py` before launching the container, is ASHA2020.
+2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab in your browser, the default password, which you can change in `jupyter_notebook_config.py` before launching the container, is ASHA2020.
 
 3. Create a Python virtutal env to install the project libraries. Do so from $CODEPATH in the Docker container, which maps to the root of this repo.
 ```
@@ -20,22 +20,18 @@ python -m venv venv
 . venv/bin/activate
 pip install --upgrade pip
 pip install encdecmeta
+# pip install -e . # uncomment to install in editable mode
 ```
 
 4. Specify $PROC_DATAPATH which should map to the preprocessed data. Below, in the section Data Layout, we describe in depth the naming conventions we expect. In the Docker container this env variable is automatatically set. It maps $CODEPATH/data/proc within the container to EncDecMeta/data/proc on your local disk.
 
-5. Specify $RESULTSPATH where any experimental results are being stored. In the Docker container this env variable is automatatically set. It maps $CODEPATH/results/ within the container to EncDecMeta/results on your local disk.
+5. Specify $RESULTSPATH where any experimental results are being stored. In the Docker container this env variable is automatatically set. It maps $CODEPATH/results within the container to EncDecMeta/results on your local disk.
 
-5. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` YOUR_CONFIG.py must me a .py file containing a dictionary named config. You can see the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary.
+5. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` YOUR_CONFIG.py must be a .py file containing a dictionary named config. You can look at the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary.
 
+## Example: U-Net
 
-
-
-
-
-
-
-For example, we can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows (see `src/configurations/unet.py`for more details).
+We can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows (see `src/configurations/unet.py`for more details).
 
 
 ```
@@ -55,6 +51,9 @@ config = {'experiment_name': 'unet_fixed',
 'batch_size': 1,
 'max_t': 500} #  max epochs (in ASHA's terms 'budget') any model may train; if searching, ASHA's early stopping points are derived from this quantity
 ```
+
+Train this model with: `$CODEPATH/src/sample_and_train.py $CODEPATH/src/configurations/unet.py`
+
 
 Instead of deciding for this fixed architecture, we can embed the above model in a search space (cf. `src/configurations/unet.py`) by altering the following the above dictionary as follows:
 
