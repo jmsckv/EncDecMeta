@@ -12,38 +12,21 @@ Current key restrictions are not data augmentation mechanisms and no ResNet-like
 1. Clone this repository: ```https://github.com/jmsckv/EncDecMeta.git && cd EncDecMeta ```
 This code is tested with CUDA 10.2, Python==3.7, and setuptools==20.3.3 on Ubuntu 18.04. Higher versions should generally be supported.
 
-2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use the `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab, the default password which you can change in `.jupyter_config.py? before launching the container is ASHA2020.
+2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use the `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab in your browser, the default password, which you can change in `jupyter_notebook_config.py` before launching the container, is ASHA2020.
 
-Next, create from $CODEPATH in the Docker container which maps to the root of this repo a Python virtual environment where you pip install the dependencies
+3. Create a Python virtutal env to install the projec libraries. Do so from $CODEPATH in the Docker container, which maps to the root of this repo.
+```
+python -m venv venv
+. venv/bin/activate
+pip install --upgrade pip
+pip install encdecmeta
 ```
 
-```
-Next, create from $CODEPATH in the Docker container which maps to the root of this repo a Python virtual environment where you pip install the dependencies
+4. Specify $PROC_DATAPATH which should map to the preprocessed data that is structured as described below in the section Data Layout. In the Docker container this env variable is automatatically set. It maps $CODEPATH/data/proc within the container to EncDecMeta/data/proc on your local disk.
 
+5. Specify $RESULTSPATH where any experimental results are being stored. In the Docker container this env variable is automatatically set. It maps $CODEPATH/results/ within the container to EncDecMeta/results on your local disk.
 
-If you don't run from within docker
-
-
-
-
-
-
-Most convenient, is to build and launch a Docker container with `. build_and_run_docker.sh` (use the _cpu.sh if no GPU is available.  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3).
-
-
-We propose to launch  a , we described how to launch in this repo in a Docker Containe
-
-
-
-
-Run 
-
-
-```
-
-
-
-```
+5. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` YOUR_CONFIG.py must me a .py file containing a dictionary named config. You can see the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary.
 
 
 
