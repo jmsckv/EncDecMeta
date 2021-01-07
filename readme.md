@@ -99,14 +99,14 @@ Currently, there are 4 operations supported:
 - `'C'` to a `3x3 convolution`
 - `'O'`(one-by-one) to a `1x1 convolution`
 
-So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now describe a layer with 3*7 + 1 = 22 architectural decisions (for 'O' we ignore the sampled operation).
-W.r.t to the above U-Net, we now describe a search space of 22**11 = 5.843183e+14 discrete architectures, the other hyperparameters not included.
+So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now describe a layer with 3 * 7 + 1 = 22 architectural decisions (for 'O' we ignore the sampled operation).
+W.r.t to the above U-Net, we hence now describe a search space of 22**11 = 5.843183e+14 discrete architectures, the other sampled hyperparameters not counted.
 
 
 
 
 
-
+## Search 
 
 
 
