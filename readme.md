@@ -36,7 +36,7 @@ pip install encdecmeta
 
 7. During training you can monitor the progress with `pip install tensorboard && tensorboard --logdir $RESULTSPATH --bind_all`.
 
-### Tips $ Tricks
+### Tips & Tricks
 
 Especially to familiarize yourself with the framework, you may want to modify the config file by adding or combining the following options:
 - `config['verbose']=True` to gain more insight on what is going in the background, e.g. metrics are being calculated
