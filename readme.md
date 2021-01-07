@@ -4,7 +4,7 @@ This repo provides a user-friendly, modular encoder decoder meta search space fo
 Fixed architectures can be specified analoguous to search space spaces in .py configuration files. 
 For example, we can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows (see)
 
-`
+'''
 c = ('C', 3)
 config = {'experiment_name': 'unet_fixed',
 'D_blocks': [[c],[c],[c],[c],[]],
@@ -21,7 +21,7 @@ config = {'experiment_name': 'unet_fixed',
 'base_channels': 64, 
 'batch_size': 1}
              
-`
+'''
 
 
 
