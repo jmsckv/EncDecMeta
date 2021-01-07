@@ -43,10 +43,12 @@ We can define an architecture close to the U-net proposed by Ronneberger et al. 
 
 
 ```
+c = ('C',3)
+
 config = {'experiment_name': 'unet_fixed',
-'D_blocks': [[c],[c],[c],[c],[]],
-'B_blocks': [[c]], 
-'U_blocks': [[c],[c],[c],[c], [c,c]],
+'D_blocks': [[c],[c],[c],[c],[]], # downsampling blocks
+'B_blocks': [[c]],  # bottleneck blocks
+'U_blocks': [[c],[c],[c],[c], [c,c]], # upsampling blocks
 'H': 256, 
 'W': 512,  
 'dropout_ratio': 0.1,
@@ -63,8 +65,7 @@ config = {'experiment_name': 'unet_fixed',
 Train this model with `$CODEPATH/src/sample_and_train.py $CODEPATH/src/configurations/unet.py`
 See the .py file for a more detailed discussion on differences to the original Unet.
 
-Overall there are 5 downsampling blocks ('D_blocks') which always 
-
+Overall there are 5 downsampling and upsampling blocks as well as one bottleneck block.
 
 ## Example: Search Unets
 
