@@ -2,7 +2,7 @@
 
 This repo provides a user-friendly, modular encoder decoder meta search space for semantic segmentation. It is based on PyTorch and Ray Tune. The search strategy is the asysnchronous successive halving algorithm (ASHA).
 
-The key use case is automating building a robusted (and searched!) baseline for semantic segmentation tasks. 
+**The key use case is automating building a robusted (and searched!) baseline for semantic segmentation tasks.**
 Current key restrictions are not data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
 
 Fixed architectures can be specified analoguous to search space spaces in .py configuration files. 
