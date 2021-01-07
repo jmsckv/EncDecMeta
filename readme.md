@@ -9,19 +9,32 @@ Current key restrictions are not data augmentation mechanisms and no ResNet-like
 
 ## Quickstart
 
+1. Clone this repository: ```https://github.com/jmsckv/EncDecMeta.git && cd EncDecMeta ```
+This code is tested with CUDA 10.2, Python==3.7, and setuptools==20.3.3 on Ubuntu 18.04. Higher versions should generally be supported.
+
+2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use the `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab, the default password which you can change in `.jupyter_config.py? before launching the container is ASHA2020.
+
+Next, create from $CODEPATH in the Docker container which maps to the root of this repo a Python virtual environment where you pip install the dependencies
 ```
-&& cd EncDecMeta
-
 
 ```
+Next, create from $CODEPATH in the Docker container which maps to the root of this repo a Python virtual environment where you pip install the dependencies
+
+
+If you don't run from within docker
 
 
 
-We propose to lau, we described how to launch in this repo in a Docker Container
 
 
 
-In general, we expect CUDA >=10.2, Python >= 
+Most convenient, is to build and launch a Docker container with `. build_and_run_docker.sh` (use the _cpu.sh if no GPU is available.  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3).
+
+
+We propose to launch  a , we described how to launch in this repo in a Docker Containe
+
+
+
 
 Run 
 
