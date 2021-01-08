@@ -38,7 +38,7 @@ pip install encdecmeta
 Especially to familiarize yourself with the framework, you may want to modify the config file by adding or combining the following options:
 - `config['verbose']=True` to gain more insight on what is going in the background, e.g. metrics are being calculated
 - `config['overfit']=True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly
-- config['num_samples']=X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
+- `config['num_samples']=X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
 
 Further you can find out about configurable hyperparameters for which a default value is set by `cd $CODEPATH && grep -r config.get`.
 
