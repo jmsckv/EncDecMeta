@@ -140,10 +140,11 @@ The search space consists of three abstractions:
 
 ## Data - How to format your datasets.
 
-The framework expects RGB images are supported  as .png files. Also the labels must be be formatted as such, but with only one channel.
+The framework expects RGB images as .png files. Also the labels must be be formatted as such, but with only 1 channel.
 Note that we expect to have data and labels the same file name. It's the parent directories data/ and labels/ which allow to differentiate between them.
 
-In general we suggest $DATAPATH to be populated as follows and require $PROC_DATAPATH to map to /proc:
+In general we suggest $DATAPATH to be populated as follows (which allows you to perform preprocessing on the raw data within Docker).
+A hard requirement is to map $PROC_DATAPATH to the root of proc/ and follow the proposed naming convention:
 
 ```
 raw/
