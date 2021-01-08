@@ -148,7 +148,7 @@ A hard requirement is to map $PROC_DATAPATH to the root of proc/ and follow the 
 
 ```
 raw/
-    specific_original_data_format_1/...
+    specific_original_data_format/...
  proc/
       data/
            train/
