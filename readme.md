@@ -5,11 +5,8 @@ This repo allows to easily specify and search encoder-decoder architectures and 
 The idea is to stack blocks: downsampling, bottleneck, and upsampling blocks.
 Each block consists of several convolutional layers. The framework allows to stack an arbitrary amount of blocks, and an arbitrary number of convolutional layers within a block. The only requirement is to have an equal number uf downsampling and upsampling blocks, at least one bottleneck block, and at least one layer within bottleneck blocks. Please also see the below section "Building Blocks". 
 
-**The current key use case is 
-
-ating building robust, searched baselines for semantic segmentation tasks.**
+**The current key use case is automated building of robust, searched baselines for semantic segmentation tasks.**
 Current restrictions are no data augmentation mechanisms and no ResNet-like or DenseNet-like connections between convolutional layers.
-
 
 ## Quickstart
 
@@ -40,8 +37,8 @@ pip install encdecmeta
 
 Especially to familiarize yourself with the framework, you may want to modify the config file by adding or combining the following options:
 - `config['verbose']=True` to gain more insight on what is going in the background, e.g. metrics are being calculated
-- `'overfit['overfit']=True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly
-- `'overfit['num_samples']=X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
+- `config['overfit']=True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly
+- config['num_samples']=X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
 
 Further you can find out about configurable hyperparameters for which a default value is set by `cd $CODEPATH && grep -r config.get`.
 
