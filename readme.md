@@ -29,7 +29,7 @@ pip install encdecmeta
 
 5. Specify $RESULTSPATH where any experimental results are being stored. In the Docker container this env variable is automatically set. It maps $CODEPATH/results within the container to EncDecMeta/results on your local disk.
 
-6. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` <YOUR_CONFIG.py> must be a .py file containing a dictionary named config. You can look at the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary.
+6. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` <YOUR_CONFIG.py> must be a .py file containing a dictionary named config. You can look at the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary. A configuration gets always validated previous to launching a search/training. You can use the terminal line output as direct feedback to reiterate (set `verbose=True` in your specified dictionary) or you directly apply `validate_config()` from $CODEPATH/src/utils/sampling.py to your specified dictionary.
 
 7. During training you can monitor the progress with `pip install tensorboard && tensorboard --logdir $RESULTSPATH --bind_all`.
 
