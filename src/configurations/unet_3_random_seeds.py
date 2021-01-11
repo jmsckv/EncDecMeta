@@ -1,5 +1,5 @@
 """
-Same as unet.py - but: this time we show how to run the same experiment with 4 random seeds.
+Same as unet.py - but: this time we show how to run the same experiment with 3 random seeds.
 
 """
 c = ('C', 3)
