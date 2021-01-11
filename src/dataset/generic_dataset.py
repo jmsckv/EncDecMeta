@@ -2,6 +2,7 @@ import torch
 import torch.utils.data
 import numpy as np
 import os
+import glob
 
 from utils.load_image import load_image
 from utils.printing import fancy_print
@@ -17,12 +18,12 @@ class GenericDataset(torch.utils.data.Dataset):
             self.test_run = 1
             self.fold = 'train'
         self.data_path = config.get('PROC_DATAPATH', os.environ['PROC_DATAPATH'])
-        self.img_dir =  os.path.join(self.data_path ,'data', self.fold)
+        self.img_dir =  os.path.join(self.data_path ,'data', self.fold) 
         self.label_dir = os.path.join(self.data_path ,'labels', self.fold)
         
         # TODO: probably dict comprehension + zip faster        
         self.examples = []
-        self.samples_dir = os.listdir(self.img_dir)
+        self.samples_dir = [i for i in os.listdir(self.img_dir) if  i.endswith('.png')]
         self.n_samples = len(self.samples_dir)
         for fn in self.samples_dir[:self.test_run]:  # important: assumed that file names in  dirs (labels/data) identical
             example = {}
@@ -47,7 +48,9 @@ class GenericDataset(torch.utils.data.Dataset):
 
         if self.debug: 
             assert fold in ['train', 'val', 'test']
-            assert len(os.listdir(self.img_dir)[:self.test_run]) == len(os.listdir(self.label_dir)[:self.test_run]), 'Image and label directory must contain an equal number of files.'
+            images_set = set([i for i in os.listdir(self.img_dir) if i.endswith('.png')])
+            labels_set = set([i for i in os.listdir(self.label_dir) if i.endswith('.png')])
+            assert images_set.difference(labels_set) + labels_set.difference(images_set) == 0, 'Image and label directory must contain an equal amount of equally named png files.'
 
         if self.debug >1:
             message = f'{str.capitalize(fold)} fold contains {self.n_samples} samples.'
