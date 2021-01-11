@@ -3,28 +3,6 @@ import torch
 # TODO: would be nice to condense this in one forward pass taking arg 'train'/'val'
 # key difficulty: context manager to deactivate gradient backprop
 
-"""
-# from tensorflow.keras.metrics import MeanIoU as MIOU
-# TF sections currently commented out
-def tf_get_metrics_at_epoch_end(tf_miou, fold, num_classes, add_metrics = {}):
-    assert fold in ['train', 'val', 'test']
-    results = OrderedDict()
-    results['mIoU_' + fold] =  tf_miou.result().numpy()
-    sum_TPs = tf_miou.total_cm.numpy().diagonal().sum()
-    sum_all = tf_miou.total_cm.numpy().sum()
-    results['acc_' + fold] = sum_TPs / sum_all
-    for i in range(num_classes - 1):
-        results['mIoU_class_' + str(i) + '_' + fold] = tf_miou.total_cm.numpy()[i][i] / \
-                                                       (sum_all - (sum_TPs - tf_miou.total_cm.numpy()[i][i]))  # 1-TN
-    if add_metrics:
-        for k in add_metrics:
-            results[k + '_' + fold] = add_metrics[k]
-    return results
-
-"""
-
-
-
 #############################
 # train forward-backward-pass
 #############################
@@ -58,7 +36,7 @@ def forward_pass_train(data_loader, optimizer, network, loss_function, metrics_a
         optimizer.step()  # perform optimization step
 
         if config['debug']:
-            if step < 5 and torch.cuda.is_available():
+            if torch.cuda.is_available():
                 assert loss_multiplier.is_cuda and epoch_loss.is_cuda and loss.is_cuda
 
     return metrics_aggregator.get_metrics(add_metrics={'loss': epoch_loss.detach()})
