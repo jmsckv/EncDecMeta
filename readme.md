@@ -57,7 +57,7 @@ The search space consists of three abstractions:
 
 ## Example: Unet
 
-We can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows:
+We can define an architecture close to the one proposed by Ronneberger et al. (2015) as follows:
 
 ```
 c = ('C',3)
