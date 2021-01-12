@@ -36,11 +36,11 @@ pip install encdecmeta
 ### Tips & Tricks
 
 Especially to familiarize yourself with the framework, you may want to modify the config file by adding or combining the following options:
-- `config['verbose']=True` to gain more insight on what is going in the background, e.g. metrics are being calculated
-- `config['overfit']=True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly
-- `config['num_samples']=X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
-- `config['grace_period']=0` to start ASHA's early stopping without a grace period. The current default is a grace period of 3 epochs.
-- `config['max_t']=X` + `config['grace_period']=X'` + `config['num_samples']=Y` to train the same architecture with Y different random seeds, each time for X periods. This allows you to get confidence bounds for your models.
+- `config['verbose'] = True` to gain more insight on what is going in the background, e.g. metrics are being calculated
+- `config['overfit'] = True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly
+- `config['num_samples'] = X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
+- `config['grace_period'] = 0` to start ASHA's early stopping without a grace period. The current default is a grace period of 3 epochs.
+- `config['max_t'] = X` + `config['grace_period'] = X ` + `config['num_samples'] = Y` to train the same architecture with Y different random seeds, each time for X periods. This allows you to get confidence bounds for your models.
 
 Further you can find out about configurable hyperparameters for which a default value is set by `cd $CODEPATH && grep -r config.get`.
 
