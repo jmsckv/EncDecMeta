@@ -11,7 +11,7 @@ Current restrictions are no data augmentation mechanisms and no ResNet-like or D
 ## Quickstart
 
 1. Clone this repository: ```https://github.com/jmsckv/EncDecMeta.git && cd EncDecMeta ```
-This code is tested with CUDA 10.2, Python 3.7.7 and setuptools 20.3.3 on Ubuntu 18.04. Higher versions should generally be supported.
+This code is tested with CUDA>=10.2, Python>=3.7 setuptools>=20.1 on Ubuntu 18.04. Higher versions should generally be supported.
 
 2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab in your browser, the default password, which you can change in `jupyter_notebook_config.py` before launching the container, is ASHA2020.
 
