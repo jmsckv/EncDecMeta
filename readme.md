@@ -44,6 +44,16 @@ Especially to familiarize yourself with the framework, you may want to modify th
 
 Further you can find out about configurable hyperparameters for which a default value is set by `cd $CODEPATH && grep -r config.get`.
 
+## Building Blocks
+
+The search space consists of three abstractions:
+
+- `Downsampling Blocks` halving the resolution of incoming feature maps while doubling the number of channels. The first operation in such a block is always hard-coded to be a 3x3 convolution with stride 2. After this layer, an arbitrary number of layers can be specified within the block.
+
+- `Bottleneck Blocks` keeping both the number of feature maps and the spatial resolution constant. Within each of these blocks at least on layer must be specified.
+
+- `Upsampling Blocks` always double the spatial resolution while halving the number of outgoing feature maps compared to the previous block. In these blocks the first two layers are hardcoded. Firstly, a 1x1 depthwise convolution fuses feature maps from the previous decoder block and the horizontally skip-connected encoder blocks of the same spatial resolution. Then a 3x3 transpose convolution with stride 2 guarantees the upsampling by a factor of two. Afterwards, an arbitrary number of layers can be horizontally stacked.
+
 
 ## Example: Unet
 
@@ -127,17 +137,6 @@ So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now describe a layer w
 W.r.t to the above Unet, we hence now describe a search space of 22**11 = 5.843183e+14 discrete architectures, the other sampled hyperparameters not counted.
 
 Note that we could easily fix parts of an encoder-decoder network while searching others, e.g. only search the last upsampling block.
-
-
-## Building Blocks
-
-The search space consists of three abstractions:
-
-- `Downsampling Blocks` halving the resolution of incoming feature maps while doubling the number of channels. The first operation in such a block is always hard-coded to be a 3x3 convolution with stride 2. After this layer, an arbitrary number of layers can be specified within the block.
-
-- `Bottleneck Blocks` keeping both the number of feature maps and the spatial resolution constant. Within each of these blocks at least on layer must be specified.
-
-- `Upsampling Blocks` always double the spatial resolution while halving the number of outgoing feature maps compared to the previous block. In these blocks the first two layers are hardcoded. Firstly, a 1x1 depthwise convolution fuses feature maps from the previous decoder block and the horizontally skip-connected encoder blocks of the same spatial resolution. Then a 3x3 transpose convolution with stride 2 guarantees the upsampling by a factor of two. Afterwards, an arbitrary number of layers can be horizontally stacked.
 
 
 ## Data - How to format your datasets.
