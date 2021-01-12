@@ -84,7 +84,7 @@ See the .py file for a more detailed discussion on differences to the original U
 
 Overall there are 5 downsampling and upsampling blocks as well as one bottleneck block.
 
-## Example: Tweaking UNet
+## Example: Tweaking Unet
 
 We can easily manually tweak an existing architecture. For example, we may alter the following model by including three more layer types
 - `c2 = ('C', 2)` #  a convolution with dilation rate 2, which we use in the lower blocks of the network
