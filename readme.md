@@ -95,9 +95,9 @@ Also we may want to add more convolutional filters in the first blocks.
 We could then reformulate the net for example as:
 
 ```
-'D_blocks': [[c,c,c],[c,c,c],[c2,c2],[c,c2],[c2,c2]]
+'D_blocks': [[c,c,c],[c,c,c],[c2,c2],[c2,h3,v2,h3,v2],[h3,v3]]
 'B_blocks': [[h3,v3,h3,v3,h3,v3]]
-'U_blocks': [[c,c2],[c2,c2],[c2,c2],[c,c,c],[c,c,c]]
+'U_blocks': [[c2,v3,h3],[c2,c2],[c2,c2],[c,c,c],[c,c,c]]
 ```
 
 
