@@ -31,13 +31,13 @@ pip install encdecmeta
 
 6. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` <YOUR_CONFIG.py> must be a .py file containing a dictionary named config. You can look at the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary. A configuration gets always validated previous to launching a search/training. You can use the terminal line output as direct feedback to reiterate (set `verbose=True` in your specified dictionary) or you directly apply `validate_config()` from $CODEPATH/src/utils/sampling.py to your specified dictionary.
 
-7. During training you can monitor the progress with `pip install tensorboard && tensorboard --logdir $RESULTSPATH --bind_all`.
+7. During training you can monitor the progress with `pip install tensorboard && tensorboard --logdir $RESULTSPATH --bind_all`. You can see an example TensorBoard output [here](https://tensorboard.dev/experiment/8BrmfQOlQ3qn2s86PopTNA/#scalars).
 
 ### Tips & Tricks
 
 Especially to familiarize yourself with the framework, you may want to modify the config file by adding or combining the following options:
 - `config['verbose'] = True` to gain more insight on what is going in the background, e.g. metrics are being calculated
-- `config['overfit'] = True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly. You can seen an example TensorBoard output [here](https://tensorboard.dev/experiment/gbKx9Fd6QlC0YlBA1roJcA/#scalars&_smoothingWeight=0&tagFilter=mIoU&runSelectionState=eyIuIjp0cnVlfQ%3D%3D)
+- `config['overfit'] = True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly. You can seen an example TensorBoard output [here](https://tensorboard.dev/experiment/gbKx9Fd6QlC0YlBA1roJcA/#scalars&_smoothingWeight=0&tagFilter=mIoU&runSelectionState=eyIuIjp0cnVlfQ%3D%3D).
 - `config['num_samples'] = X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
 - `config['grace_period'] = 0` to start ASHA's early stopping without a grace period. The current default is a grace period of 3 epochs.
 - `config['max_t'] = X` + `config['grace_period'] = X ` + `config['num_samples'] = Y` to train the same architecture with Y different random seeds, each time for X periods. This allows you to get confidence bands for a given model.
