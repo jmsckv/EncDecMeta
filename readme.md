@@ -11,7 +11,7 @@ Current restrictions are no data augmentation mechanisms and no ResNet-like or D
 ## Quickstart
 
 1. Clone this repository: ```https://github.com/jmsckv/EncDecMeta.git && cd EncDecMeta ```
-This code is tested with CUDA 10.2, Python 3.7.7 and setuptools 20.3.3 on Ubuntu 18.04. Higher versions should generally be supported.
+This code is tested with CUDA>=10.2, Python>=3.7 setuptools>=20.1 on Ubuntu 18.04. Higher versions should generally be supported.
 
 2. We recommend to launch a Docker container with `. build_and_run_docker.sh` (use `_cpu.sh` if no GPU is available).  This will automatically create the expected directory structure and environment variables. It also auto-detects free ports for JupyterLab ($PORT1), Tensorboard ($PORT2), and the Ray Dashboard ($PORT3). Run `docker ps` to see where to retrieve e.g. JupyterLab in your browser, the default password, which you can change in `jupyter_notebook_config.py` before launching the container, is ASHA2020.
 
@@ -22,7 +22,7 @@ python -m venv venv
 . venv/bin/activate
 pip install --upgrade pip
 pip install encdecmeta
-# pip install -e . # run this instead the previous command to install in editable mode
+# pip install -e . # run this instead of the previous command to install in editable mode
 ```
 
 4. Specify $PROC_DATAPATH which should map to the preprocessed data. Below, in the section Data Layout, we describe in depth the naming conventions we expect. In the Docker container this env variable is automatically set. It maps $CODEPATH/data/proc within the container to EncDecMeta/data/proc on your local disk.
@@ -31,21 +31,32 @@ pip install encdecmeta
 
 6. Run Experiments with `$CODEPATH/src/sample_and_train.py <YOUR_CONFIG.py>.` <YOUR_CONFIG.py> must be a .py file containing a dictionary named config. You can look at the Python files in `$CODEPATH/src/configurations/` to learn about specifying a configuration dictionary. A configuration gets always validated previous to launching a search/training. You can use the terminal line output as direct feedback to reiterate (set `verbose=True` in your specified dictionary) or you directly apply `validate_config()` from $CODEPATH/src/utils/sampling.py to your specified dictionary.
 
-7. During training you can monitor the progress with `pip install tensorboard && tensorboard --logdir $RESULTSPATH --bind_all`.
+7. During training you can monitor the progress with `pip install tensorboard && tensorboard --logdir $RESULTSPATH --bind_all`. You can see an example TensorBoard output [here](https://tensorboard.dev/experiment/8BrmfQOlQ3qn2s86PopTNA/#scalars).
 
 ### Tips & Tricks
 
 Especially to familiarize yourself with the framework, you may want to modify the config file by adding or combining the following options:
-- `config['verbose']=True` to gain more insight on what is going in the background, e.g. metrics are being calculated
-- `config['overfit']=True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly
-- `config['num_samples']=X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
+- `config['verbose'] = True` to gain more insight on what is going in the background, e.g. metrics are being calculated
+- `config['overfit'] = True` to overfit the model on 1 val=train sample, which allows to check that the gradient updates work correctly. You can seen an example TensorBoard output [here](https://tensorboard.dev/experiment/gbKx9Fd6QlC0YlBA1roJcA/#scalars&_smoothingWeight=0&tagFilter=mIoU&runSelectionState=eyIuIjp0cnVlfQ%3D%3D).
+- `config['num_samples'] = X` with e.g. X=5 to restrict the training to 5 training/val samples which is useful if you want to simulate the outcomes of a search
+- `config['grace_period'] = 0` to start ASHA's early stopping without a grace period. The current default is a grace period of 3 epochs.
 
 Further you can find out about configurable hyperparameters for which a default value is set by `cd $CODEPATH && grep -r config.get`.
+
+## Building Blocks
+
+The search space consists of three abstractions:
+
+- `Downsampling Blocks` halving the resolution of incoming feature maps while doubling the number of channels. The first operation in such a block is always hard-coded to be a 3x3 convolution with stride 2. After this layer, an arbitrary number of layers can be specified within the block.
+
+- `Bottleneck Blocks` keeping both the number of feature maps and the spatial resolution constant. Within each of these blocks at least on layer must be specified.
+
+- `Upsampling Blocks` always double the spatial resolution while halving the number of outgoing feature maps compared to the previous block. In these blocks the first two layers are hardcoded. Firstly, a 1x1 depthwise convolution fuses feature maps from the previous decoder block and the horizontally skip-connected encoder blocks of the same spatial resolution. Then a 3x3 transpose convolution with stride 2 guarantees the upsampling by a factor of two. Afterwards, an arbitrary number of layers can be horizontally stacked.
 
 
 ## Example: Unet
 
-We can define an architecture close to the U-net proposed by Ronneberger et al. (2015) as follows:
+We can define an architecture close to the one proposed by Ronneberger et al. (2015) as follows:
 
 ```
 c = ('C',3)
@@ -72,7 +83,7 @@ See the .py file for a more detailed discussion on differences to the original U
 
 Overall there are 5 downsampling and upsampling blocks as well as one bottleneck block.
 
-## Example: Tweaking UNet
+## Example: Tweaking Unet
 
 We can easily manually tweak an existing architecture. For example, we may alter the following model by including three more layer types
 - `c2 = ('C', 2)` #  a convolution with dilation rate 2, which we use in the lower blocks of the network
@@ -83,9 +94,9 @@ Also we may want to add more convolutional filters in the first blocks.
 We could then reformulate the net for example as:
 
 ```
-'D_blocks': [[c,c,c],[c,c,c],[c2,c2],[c,c2],[c2,c2]]
+'D_blocks': [[c,c,c],[c,c,c],[c2,c2],[c2,h3,v2,h3,v2],[h3,v3]]
 'B_blocks': [[h3,v3,h3,v3,h3,v3]]
-'U_blocks': [[c,c2],[c2,c2],[c2,c,2],[c,c,c],[c,c,c]]
+'U_blocks': [[c2,v3,h3],[c2,c2],[c2,c2],[c,c,c],[c,c,c]]
 ```
 
 
@@ -125,17 +136,6 @@ So by adjusting `c = (['H','V','C','O'], range(1,8))`, we now describe a layer w
 W.r.t to the above Unet, we hence now describe a search space of 22**11 = 5.843183e+14 discrete architectures, the other sampled hyperparameters not counted.
 
 Note that we could easily fix parts of an encoder-decoder network while searching others, e.g. only search the last upsampling block.
-
-
-## Building Blocks
-
-The search space consists of three abstractions:
-
-- `Downsampling Blocks` halving the resolution of incoming feature maps while doubling the number of channels. The first operation in such a block is always hard-coded to be a 3x3 convolution with stride 2. After this layer, an arbitrary number of layers can be specified within the block.
-
-- `Bottleneck Blocks` keeping both the number of feature maps and the spatial resolution constant. Within each of these blocks at least on layer must be specified.
-
-- `Upsampling Blocks` always double the spatial resolution while halving the number of outgoing feature maps compared to the previous block. In these blocks the first two layers are hardcoded. Firstly, a 1x1 depthwise convolution fuses feature maps from the previous decoder block and the horizontally skip-connected encoder blocks of the same spatial resolution. Then a 3x3 transpose convolution with stride 2 guarantees the upsampling by a factor of two. Afterwards, an arbitrary number of layers can be horizontally stacked.
 
 
 ## Data - How to format your datasets.
